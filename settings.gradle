@@ -1,0 +1,2 @@
+rootProject.name = "calendar_task_manager"
+include ':app'
