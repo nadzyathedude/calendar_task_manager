@@ -2,56 +2,86 @@ package com.example.calendar_task_manager
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.calendar_task_manager.databinding.ActivityCalendarBinding
 import com.example.calendar_task_manager.databinding.ListItemViewBinding
+import com.example.calendar_task_manager.storage.Storage
+import com.example.calendar_task_manager.task.Task
+import org.json.JSONArray
+import java.util.*
 
 class CalendarActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityCalendarBinding
+    private val binding by lazy {
+        ActivityCalendarBinding.inflate(layoutInflater)
+    }
+    private val storage by lazy {
+        Storage(this)
+    }
+    private val taskList = mutableListOf<Task>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCalendarBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        putDummyTaskListToStorage()
+        initTaskListFromStorage()
+        initTaskRecyclerView()
+    }
+
+    private fun initTaskListFromStorage() {
+        val taskListFromStorage = getTaskListFromStorage() ?: return
+        taskList.addAll(taskListFromStorage)
+    }
+
+    private fun putDummyTaskListToStorage() {
+        val taskList = mutableListOf<Task>()
+        taskList.add(Task(0, "task 1", "", 0, 0))
+        taskList.add(Task(1, "task 2", "", 0, 0))
+        val taskListJsonArray = JSONArray()
+        for (task in taskList) {
+            taskListJsonArray.put(task.createJsonObject())
+        }
+        storage.saveString(taskListJsonArray.toString(), AppConstants.TASK_LIST_STRING_STORAGE_KEY)
+    }
+
+    private fun getTaskListFromStorage(): List<Task>? {
+        val tasksJsonString =
+            storage.getString(AppConstants.TASK_LIST_STRING_STORAGE_KEY) ?: return null
+        val jsonArray = JSONArray(tasksJsonString)
+        val taskList = mutableListOf<Task>()
+        for (i in 0 until jsonArray.length()) {
+            val taskJsonObject = jsonArray.getJSONObject(i)
+            val task = Task.initFromJsonObject(taskJsonObject)
+            taskList.add(task)
+        }
+        return taskList
+    }
+
+    private fun initTaskRecyclerView() {
         binding.taskList.layoutManager = LinearLayoutManager(this)
-        binding.taskList.adapter = Adapter(generateFakeValues())
+        binding.taskList.adapter = TaskAdapter(taskList)
     }
 
-    private  fun generateFakeValues(): List<String>{
-        val values = mutableListOf<String>()
-        for(i in 1 .. 4){
-            values.add("$i task ")
-        }
-        return values
-    }
+    class TaskAdapter(private var taskList: List<Task>) :
+        RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+        override fun getItemCount() = taskList.size
 
-    class Adapter(private val values: List<String>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
-
-
-        override fun getItemCount() = values.size
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
             val itemView =
-                LayoutInflater.from(parent?.context).inflate(R.layout.list_item_view, parent, false)
-
-            return ViewHolder(itemView)
+                LayoutInflater.from(parent.context).inflate(R.layout.list_item_view, parent, false)
+            return TaskViewHolder(ListItemViewBinding.bind(itemView))
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.textView?.text = values[position]
+        override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+            holder.setTaskName(taskList[position].name)
         }
 
-        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-            var textView: TextView? = null
-
-            init {
-                textView = itemView.findViewById(R.id.taskText)
+        class TaskViewHolder(private val binding: ListItemViewBinding) :
+            RecyclerView.ViewHolder(binding.root) {
+            fun setTaskName(name: String) {
+                binding.taskText.text = name
             }
         }
     }
