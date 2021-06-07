@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calendar_task_manager">
-        <activity android:name=".TaskActivity"></activity>
+        <activity android:name=".task.TaskActivity"></activity>
         <activity android:name=".CalendarActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

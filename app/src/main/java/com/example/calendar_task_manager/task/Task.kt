@@ -16,11 +16,6 @@ data class Task(
     var date_finish: Long,
 ) {
     companion object {
-       /* private const val ID_JSON_KEY = "id"
-        private const val NAME_JSON_KEY = "name"
-        private const val DESCRIPTION_JSON_KEY = "description"
-        private const val DATE_START_JSON_KEY = "date_start"
-        private const val DATE_FINISH_JSON_KEY = "date_finish"*/
 
         fun initFromJsonObject(taskJsonObject: JSONObject): Task {
             val id = taskJsonObject.getInt(ID_JSON_KEY)

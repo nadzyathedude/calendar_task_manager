@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.applandeo.materialcalendarview.EventDay
+import com.applandeo.materialcalendarview.listeners.OnDayClickListener
 import com.example.calendar_task_manager.databinding.ActivityCalendarBinding
 import com.example.calendar_task_manager.databinding.ListItemViewBinding
 import com.example.calendar_task_manager.storage.Storage
 import com.example.calendar_task_manager.task.Task
 import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
 
 class CalendarActivity : AppCompatActivity() {
@@ -30,6 +34,7 @@ class CalendarActivity : AppCompatActivity() {
         initTaskRecyclerView()
     }
 
+
     private fun initTaskListFromStorage() {
         val taskListFromStorage = getTaskListFromStorage() ?: return
         taskList.addAll(taskListFromStorage)
@@ -37,8 +42,8 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun putDummyTaskListToStorage() {
         val taskList = mutableListOf<Task>()
-        taskList.add(Task(0, "task 1", "", 0, 0))
-        taskList.add(Task(1, "task 2", "", 0, 0))
+        taskList.add(Task(0, "do homework", "math, astrology", 147600000, 147610000))
+        taskList.add(Task(1, "go shopping", "milk, bread, tomatoes", 1622976895, 1622987695))
         val taskListJsonArray = JSONArray()
         for (task in taskList) {
             taskListJsonArray.put(task.createJsonObject())

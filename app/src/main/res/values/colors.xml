@@ -13,4 +13,5 @@
     <color name="colorSecondary">#0E53A7</color>
     <color name="colorSecondaryVariant">#4284D3</color>
     <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="backGroundColorForFragment">#D9F2E6</color>
 </resources>
